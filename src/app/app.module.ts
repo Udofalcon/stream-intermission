@@ -3,16 +3,19 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AudioComponent } from './audio/audio.component';
+// import { Shader } from './shader/shader';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AudioComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  // providers: [Shader],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

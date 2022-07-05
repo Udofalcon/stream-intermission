@@ -40,3 +40,9 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Mocks
+api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json
+
+# Music
+*.wav
