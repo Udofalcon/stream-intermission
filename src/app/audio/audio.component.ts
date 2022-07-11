@@ -1,7 +1,8 @@
 // Swiped most of this from https://github.com/UnderMybrella/EternalJukebox
 
-import { Component, OnInit } from '@angular/core';
-import * as api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ from './api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json';
+import { Component, Input, OnInit } from '@angular/core';
+import { SharedService } from '../shared/shared.service';
+import * as api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ from './api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json'; // This is a Spotify response. I only have one song, so I just saved the response.
 
 @Component({
   selector: 'app-audio',
@@ -15,6 +16,8 @@ export class AudioComponent implements OnInit {
   private player: any;
   private remixer: any;
   private track: any;
+
+  @Input() shared_service: SharedService | undefined;
 
   constructor() {
     this.jukeboxData = {
@@ -45,7 +48,7 @@ export class AudioComponent implements OnInit {
     return {
       remixTrack: (track: any, callback: any) => {
         const fetchAudio = () => {
-          fetch('assets/ABeautifulLife.wav')
+          fetch('assets/ABeautifulLife.wav') // I only have the one song, so I just dropped it here instead of hitting the Youtube API.
             .then(response => response.arrayBuffer())
             .then(buffer => context.decodeAudioData(buffer))
             .then(buffer => {
@@ -213,7 +216,7 @@ export class AudioComponent implements OnInit {
         let curAudioSource: any = null;
         let curQ: any = null;
 
-        audioGain.gain.value = 0.5;
+        audioGain.gain.value = 0.1;
         audioGain.connect(context.destination);
 
         const playQuantum = (when: any, q: any): any => {
@@ -345,6 +348,8 @@ export class AudioComponent implements OnInit {
       } else {
         curTile = curOp();
       }
+
+      this.shared_service?.setBeat(curTile.which);
 
       const ctime = player.curTime();
 

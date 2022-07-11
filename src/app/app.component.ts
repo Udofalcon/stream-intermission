@@ -1,39 +1,19 @@
-import { Component, HostListener } from '@angular/core';
-// import { Shader } from './shader/shader';
+import { Component } from '@angular/core';
+import { SharedService } from './shared/shared.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.sass']
+  styleUrls: ['./app.component.sass'],
+  providers: [SharedService]
 })
 export class AppComponent {
-  title = 'stream-intermission';
+  public sharedService: SharedService;
 
-  private canvas: any;
-  private context: any;
-  // private gl: any;
-  // private shader: Shader;
-
-  // constructor (shader: Shader) {
-  //   this.shader = shader;
-  // }
-
-  ngOnInit() {
-    this.canvas = document.getElementById('canvas');
-    // this.gl = this.canvas.getContext('webgl2');
-    this.context = this.canvas.getContext('2d');
-
-    this.resizeCanvas(document.body.clientWidth, document.body.clientHeight);
-    // this.shader.attachShader(this.gl);
+  constructor() {
+    this.sharedService = new SharedService();
+    console.log(this.sharedService);
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.resizeCanvas(event.target.innerWidth, event.target.innerHeight);
-  }
-
-  resizeCanvas(width: Number, height: Number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-  }
+  ngOnInit(): void {}
 }

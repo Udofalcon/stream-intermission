@@ -1,5 +1,2 @@
-<canvas
-    id="canvas"
-    (window:resize)="onResize($event)"></canvas>
-
-<app-audio></app-audio>
+<app-simulation [shared_service]="sharedService"></app-simulation>
+<app-audio [shared_service]="sharedService"></app-audio>
