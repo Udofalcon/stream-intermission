@@ -4,6 +4,9 @@ jobs:
   install:
     docker:
       - image: node:lts
+    persist_to_workspace:
+      paths:
+        - /stream-intermission
     steps:
       - checkout
       - run: apt update
