@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   unit-tests:
     docker:
-      - image: node:lts
+      - image: node:lts-browsers
     steps:
       - checkout
       - run: npm install
