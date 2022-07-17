@@ -26,6 +26,6 @@ workflows:
   main:
     jobs:
       - install
-      - test
+      - test:
           requires:
             - install
