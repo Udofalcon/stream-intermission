@@ -2,6 +2,6 @@ import { JRemixer } from './jremixer';
 
 describe('JRemixer', () => {
   it('should create an instance', () => {
-    expect(new JRemixer()).toBeTruthy();
+    expect(new JRemixer(new AudioContext())).toBeTruthy();
   });
 });
