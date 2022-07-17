@@ -4,9 +4,6 @@ jobs:
   install:
     docker:
       - image: node:lts
-    persist_to_workspace:
-      paths:
-        - /stream-intermission
     steps:
       - checkout
       - run: apt update
@@ -14,6 +11,9 @@ jobs:
       - run: apt install chromium -y
       - run: npm install
       - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
+      - persist_to_workspace:
+          paths:
+            - /stream-intermission
     working_directory: /stream-intermission
   test:
     docker:
