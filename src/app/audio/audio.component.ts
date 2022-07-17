@@ -3,6 +3,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SharedService } from '../shared/shared.service';
 import * as api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ from './api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json'; // This is a Spotify response. I only have one song, so I just saved the response.
+import { JukeboxData } from './jukebox-data';
 
 @Component({
   selector: 'app-audio',
@@ -12,7 +13,7 @@ import * as api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ from './api_analysis_ana
 export class AudioComponent implements OnInit {
   private context: any;
   private driver: any;
-  private jukeboxData: any;
+  private jukeboxData: JukeboxData;
   private player: any;
   private remixer: any;
   private track: any;
@@ -20,21 +21,7 @@ export class AudioComponent implements OnInit {
   @Input() shared_service: SharedService | undefined;
 
   constructor() {
-    this.jukeboxData = {
-      maxBranches: 4,        // max branches allowed per beat
-      maxBranchThreshold: 80, // max allowed distance threshold
-
-      currentThreshold: 2,    // current in-use max threshold
-      addLastEdge: true,      // if true, optimize by adding a good last edge
-
-      tiles: [],              // all of the tiles
-      allEdges: [],           // all of the edges
-      deletedEdges: [],       // edges that should be deleted
-
-      minRandomBranchChance: 0.18,
-      randomBranchChanceDelta: 0.18,
-      curRandomBranchChance: 0,
-    };
+    this.jukeboxData = new JukeboxData();
   }
 
   ngOnInit(): void {
@@ -276,7 +263,6 @@ export class AudioComponent implements OnInit {
 
   readyToPlay(t: any): void {
     this.driver = this.Driver(this.player);
-    this.trackReady();
     this.drawVisualization();
     setTimeout(() => {
       this.driver.start();
@@ -294,18 +280,18 @@ export class AudioComponent implements OnInit {
       let nextIndex;
 
       if (curTile === null || curTile === undefined) {
-        return this.jukeboxData.tiles[0];
+        return this.jukeboxData.getTile(0);
       } else {
         nextIndex = curTile.which + incr;
       }
 
       if (nextIndex < 0) {
-        return this.jukeboxData.tiles[0];
-      } else if (nextIndex >= this.jukeboxData.tiles.length) {
+        return this.jukeboxData.getTile(0);
+      } else if (nextIndex >= this.jukeboxData.getTileCount()) {
         curOp = null;
         player.stop();
       } else {
-        return selectRandomNextTile(this.jukeboxData.tiles[nextIndex]);
+        return selectRandomNextTile(this.jukeboxData.getTile(nextIndex));
       }
     };
     const selectRandomNextTile = (seed: any): any => {
@@ -314,7 +300,6 @@ export class AudioComponent implements OnInit {
       } else if (shouldRandomBranch(seed.q)) {
         const next = seed.q.neighbors.shift();
 
-        this.jukeboxData.lastThreshold = next.distance;
         seed.q.neighbors.push(next);
 
         return next.dest.tile;
@@ -322,24 +307,10 @@ export class AudioComponent implements OnInit {
         return seed;
       }
     };
+
+    // Only have the last branch in my song
     const shouldRandomBranch = (q: any): boolean => {
-      if (q.which === this.jukeboxData.lastBranchPoint) {
-        return true;
-      }
-
-      this.jukeboxData.curRandomBranchChance += this.jukeboxData.randomBranchChanceDelta;
-
-      if (this.jukeboxData.curRandomBranchChance > this.jukeboxData.maxRandomBranchChance) {
-        this.jukeboxData.curRandomBranchChance = this.jukeboxData.maxRandomBranchChance;
-      }
-
-      const shouldBranch = Math.random() < this.jukeboxData.curRandomBranchChance;
-
-      if (shouldBranch) {
-        this.jukeboxData.curRandomBranchChance = this.jukeboxData.minRandomBranchChance;
-      }
-
-      return shouldBranch;
+      return q.which === this.jukeboxData.getLastBranchPoint();
     };
     const process = () => {
       if (nextTile !== null) {
@@ -365,7 +336,6 @@ export class AudioComponent implements OnInit {
     return {
       start: () => {
         nextTime = 0;
-        this.jukeboxData.curRandomBranchChance = this.jukeboxData.minRandomBranchChance;
         curOp = next;
         process();
       },
@@ -381,17 +351,13 @@ export class AudioComponent implements OnInit {
     };
   }
 
-  trackReady(): void {
-    this.jukeboxData.minLongBranch = this.track.analysis.beats.length / 5;
-  }
-
   drawVisualization(): void {
-    this.calculateNearestNeighbors('beats', this.jukeboxData.currentThreshold);
+    this.calculateNearestNeighbors('beats', this.jukeboxData.getCurrentThreshold());
     this.createTilePanel('beats');
   }
 
   calculateNearestNeighbors(type: string, threshold: number): number {
-    this.precalculateNearestNeighbors(type, this.jukeboxData.maxBranches, this.jukeboxData.maxBranchThreshold);
+    this.precalculateNearestNeighbors(type, this.jukeboxData.getMaxBranches(), this.jukeboxData.getMaxBranchThreshold());
     
     const count = this.collectNearestNeighbors(type, threshold);
 
@@ -405,7 +371,7 @@ export class AudioComponent implements OnInit {
       return;
     }
 
-    this.jukeboxData.allEdges = [];
+    this.jukeboxData.resetAllEdges();
 
     for (let qi = 0; qi < this.track.analysis[type].length; qi++) {
       let q1 = this.track.analysis[type][qi];
@@ -477,8 +443,8 @@ export class AudioComponent implements OnInit {
       const edge = edges[i];
 
       q1.all_neighbors.push(edge);
-      edge.id = this.jukeboxData.allEdges.length;
-      this.jukeboxData.allEdges.push(edge);
+      edge.id = this.jukeboxData.getAllEdgesCount();
+      this.jukeboxData.addEdge(edge);
     }
   }
 
@@ -556,36 +522,33 @@ export class AudioComponent implements OnInit {
   postProcessNearestNeighbors(type: string): void {
     this.removeDeletedEdges();
 
-    if (this.jukeboxData.addLastEdge) {
-      if (this.longestBackwardBranch(type) < 50) {
-        this.insertBestBackwardBranch(type, this.jukeboxData.currentThreshold, 65);
-      } else {
-        this.insertBestBackwardBranch(type, this.jukeboxData.currentThreshold, 55);
-      }
+    if (this.longestBackwardBranch(type) < 50) {
+      this.insertBestBackwardBranch(type, this.jukeboxData.getCurrentThreshold(), 65);
+    } else {
+      this.insertBestBackwardBranch(type, this.jukeboxData.getCurrentThreshold(), 55);
     }
 
     this.calculateReachability(type);
-    this.jukeboxData.lastBranchPoint = this.findBestLastBeat(type);
-    this.filterOutBadBranches(type, this.jukeboxData.lastBranchPoint);
+    this.jukeboxData.setLastBranchPoint(this.findBestLastBeat(type));
+    this.filterOutBadBranches(type, this.jukeboxData.getLastBranchPoint());
   }
 
   removeDeletedEdges(): void {
-    for (let i = 0; i < this.jukeboxData.deletedEdges.length; i++) {
-      const edgeID = this.jukeboxData.deletedEdges[i];
+    for (let i = 0; i < this.jukeboxData.getDeletedEdgeCount(); i++) {
+      const edgeID = this.jukeboxData.getDeletedEdge(i);
 
-      if (edgeID in this.jukeboxData.allEdges) {
-        const edge = this.jukeboxData.allEdges[edgeID];
+      if (edgeID in this.jukeboxData.getDeletedEdges()) {
+        const edge = this.jukeboxData.getDeletedEdge(edgeID);
 
         this.deleteEdge(edge);
       }
     }
 
-    this.jukeboxData.deletedEdges = [];
+    this.jukeboxData.resetDeletedEdges();
   }
 
   deleteEdge(edge: any): void {
     if (!edge.deleted) {
-      this.jukeboxData.deletedEdgeCount++;
       edge.deleted = true;
 
       if (edge.curve) {
@@ -746,9 +709,6 @@ export class AudioComponent implements OnInit {
         }
       }
     }
-
-    this.jukeboxData.totalBeats = quanta.length;
-    this.jukeboxData.longestReach = longestReach;
     
     return longest;
   }
@@ -774,11 +734,11 @@ export class AudioComponent implements OnInit {
 
   createTilePanel(which: string): void {
     this.removeAllTiles();
-    this.jukeboxData.tiles = this.createTiles(which);
+    this.jukeboxData.setTiles(this.createTiles(which));
   }
 
   removeAllTiles(): void {
-    this.jukeboxData.tiles = [];
+    this.jukeboxData.resetTiles();
   }
 
   createTiles(qtype: string): any {
