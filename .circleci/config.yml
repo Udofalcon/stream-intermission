@@ -4,6 +4,7 @@ jobs:
   unit-tests:
     docker:
       - image: node:lts
+      - user: node
     environment:
       CHROME_BIN: /usr/bin/chromium
     steps:
