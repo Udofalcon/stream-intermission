@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: npm install
       - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
-      - run: npm run test
+      - run: npm run test:ci
 
 workflows:
   main:
