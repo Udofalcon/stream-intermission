@@ -1,14 +1,15 @@
 version: 2.1
 
 jobs:
-  main:
+  unit-tests:
     docker:
       - image: node:lts
     steps:
       - checkout
       - run: npm install
+      - run: npm run test
 
 workflows:
   main:
     jobs:
-      - main
+      - unit-tests
