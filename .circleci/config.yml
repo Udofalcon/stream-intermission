@@ -6,6 +6,7 @@ jobs:
       - image: node:lts
     steps:
       - checkout
+      - run: npm install
 
 workflows:
   main:
