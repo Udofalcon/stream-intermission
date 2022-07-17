@@ -1,12 +1,9 @@
 version: 2.1
 
 jobs:
-  unit-tests:
+  install:
     docker:
       - image: node:lts
-        user: node
-    environment:
-      CHROME_BIN: /usr/bin/chromium
     steps:
       - checkout
       - run: apt update
@@ -14,9 +11,19 @@ jobs:
       - run: apt install chromium -y
       - run: npm install
       - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
+    working_directory: /stream-intermission
+  test:
+    docker:
+      - image: node:lts
+        user: node
+    environment:
+      CHROME_BIN: /usr/bin/chromium
+    steps:
       - run: npm run test:ci
+    working_directory: /stream-intermission
 
 workflows:
   main:
     jobs:
-      - unit-tests
+      - install
+      - test
