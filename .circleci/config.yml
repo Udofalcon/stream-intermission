@@ -1,0 +1,21 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: node:lts
+    environment:
+      CHROME_BIN: /usr/bin/chromium
+    steps:
+      - checkout
+      - run: apt update
+      - run: apt upgrade
+      - run: apt install chromium -y
+      - run: npm install
+      - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
+      - run: npm run test:ci
+
+workflows:
+  main:
+    jobs:
+      - test
