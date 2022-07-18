@@ -13,9 +13,9 @@ jobs:
       - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
       - persist_to_workspace:
           paths:
-            - /stream-intermission
-          root: /
-    working_directory: /stream-intermission
+            - ~/stream-intermission
+          root: ~
+    working_directory: ~/stream-intermission
   test:
     docker:
       - image: node:lts
@@ -24,7 +24,7 @@ jobs:
       CHROME_BIN: /usr/bin/chromium
     steps:
       - run: npm run test:ci
-    working_directory: /stream-intermission
+    working_directory: ~/stream-intermission
 
 workflows:
   main:
