@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  install:
+  test:
     docker:
       - image: node:lts
     steps:
@@ -9,33 +9,11 @@ jobs:
       - run: apt update
       - run: apt upgrade
       - run: apt install chromium -y
-      - run: mkdir bin
-      - run: mv /usr/bin/chromium ./bin/chromium
       - run: npm install
       - run: curl -o ./src/app/audio/api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json https://eternalbox.dev/api/analysis/analyse/1xRg5kRYm923OSqvmCZnvJ
-      - persist_to_workspace:
-          paths:
-            - project
-          root: /root
-  test:
-    docker:
-      - image: node:lts
-        user: node
-    environment:
-      CHROME_BIN: /home/node/project/bin/chromium
-    steps:
-      - run: pwd
-      - run: ls -la
-      - attach_workspace:
-          at: /home/node
-      - run: pwd
-      - run: ls -la
       - run: npm run test:ci
 
 workflows:
   main:
     jobs:
-      - install
-      - test:
-          requires:
-            - install
+      - test
