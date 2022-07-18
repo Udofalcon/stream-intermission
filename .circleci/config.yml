@@ -6,8 +6,6 @@ jobs:
       - image: node:lts
     steps:
       - checkout
-      - run: pwd
-      - run: ls -la
       - run: apt update
       - run: apt upgrade
       - run: apt install chromium -y
@@ -24,6 +22,8 @@ jobs:
     environment:
       CHROME_BIN: /usr/bin/chromium
     steps:
+      - attach_workspace:
+          at: /root/project
       - run: npm run test:ci
 
 workflows:
