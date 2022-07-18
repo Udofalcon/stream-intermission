@@ -22,6 +22,8 @@ jobs:
     environment:
       CHROME_BIN: /usr/bin/chromium
     steps:
+      - run: pwd
+      - run: ls -la
       - attach_workspace:
           at: /root/project
       - run: npm run test:ci
