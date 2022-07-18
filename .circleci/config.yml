@@ -26,6 +26,8 @@ jobs:
       - run: ls -la
       - attach_workspace:
           at: .
+      - run: pwd
+      - run: ls -la
       - run: npm run test:ci
 
 workflows:
