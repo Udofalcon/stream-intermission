@@ -22,7 +22,7 @@ jobs:
       - image: node:lts
         user: node
     environment:
-      CHROME_BIN: /usr/bin/chromium
+      CHROME_BIN: /home/node/project/bin/chromium
     steps:
       - run: pwd
       - run: ls -la
@@ -30,7 +30,6 @@ jobs:
           at: /home/node
       - run: pwd
       - run: ls -la
-      - run: mv ./bin/chromium /usr/bin/chromium
       - run: npm run test:ci
 
 workflows:
