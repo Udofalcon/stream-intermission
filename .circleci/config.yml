@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: node:lts
     environment:
-      CHROME_BIN: /home/node/project/bin/chromium
+      CHROME_BIN: /usr/bin/chromium
     steps:
       - checkout
       - run: apt update
