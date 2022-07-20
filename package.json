@@ -9,7 +9,7 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false",
     "api": "pm2 start ./api/router.js --watch ./api/*.js",
-    "api-log": "pm2 log router"
+    "api:log": "pm2 log router"
   },
   "private": true,
   "dependencies": {
