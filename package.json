@@ -26,7 +26,7 @@
     "pm2": "^5.2.0",
     "tmi.js": "^1.8.5",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^13.3.8",
