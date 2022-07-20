@@ -5,6 +5,7 @@ import { SharedService } from '../shared/shared.service';
 import * as api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ from './api_analysis_analyse_1xRg5kRYm923OSqvmCZnvJ.json'; // This is a Spotify response. I only have one song, so I just saved the response.
 import { JRemixer } from './jremixer/jremixer';
 import { JukeboxData } from './jukebox-data/jukebox-data';
+import { Tiles } from './tiles/tiles';
 
 @Component({
   selector: 'app-audio',
@@ -138,7 +139,7 @@ export class AudioComponent implements OnInit {
 
   drawVisualization(): void {
     this.calculateNearestNeighbors('beats', this.jukeboxData.getCurrentThreshold());
-    this.createTilePanel('beats');
+    this.jukeboxData.setTiles(Tiles.createTiles(this.track));
   }
 
   calculateNearestNeighbors(type: string, threshold: number): number {
@@ -515,42 +516,5 @@ export class AudioComponent implements OnInit {
 
       q.neighbors = newList;
     }
-  }
-
-  createTilePanel(which: string): void {
-    this.removeAllTiles();
-    this.jukeboxData.setTiles(this.createTiles(which));
-  }
-
-  removeAllTiles(): void {
-    this.jukeboxData.resetTiles();
-  }
-
-  createTiles(qtype: string): any {
-    return this.createTileCircle(qtype);
-  }
-
-  createTileCircle(qtype: string): any {
-    const tiles = [];
-    const qlist = this.track.analysis[qtype];
-
-    for (let i = 0; i < qlist.length; i++) {
-      const tile = this.createNewTile(i, qlist[i]);
-
-      tiles.push(tile);
-    }
-
-    return tiles;
-  }
-
-  createNewTile(which: number, q: any): any {
-    const tile = {
-      which: which,
-      q: q
-    };
-
-    q.tile = tile;
-
-    return tile;
   }
 }
