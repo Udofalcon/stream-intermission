@@ -1,8 +1,5 @@
 import { Tile } from '../types/tile';
 
-declare global {
-    interface Window { test: string; }
-}
 export class Tiles {
     static createTiles(track: any): Array<Tile> {
         const tiles = new Array<Tile>();
